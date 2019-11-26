@@ -69,6 +69,7 @@ KeyboardForm::KeyboardForm(QWidget *parent) : QDialog(parent),
     m_labPyText->setFocusPolicy(Qt::NoFocus);
     //m_labPyText->setStyleSheet("background: #a0ffffff; border-color: gray; border-width: 1px; border-style: solid; border-radius: 5px;");
     QHBoxLayout *h1 = new QHBoxLayout;
+    m_labPyText->resize(this->width(),10);
     h1->addWidget(m_labPyText);
     h1->addStretch();
 
@@ -246,6 +247,8 @@ KeyboardForm::KeyboardForm(QWidget *parent) : QDialog(parent),
     btnHide->setFont(icofont);
     btnHide->setFixedSize(btnWidth*1.5, btnHeight);
     connect(btnHide, SIGNAL(clicked()), SLOT(hide()));
+    connect(btnHide, SIGNAL(clicked()), this, SLOT(hideWidget()));
+
     h7->addWidget(btnHide);
 
     QVBoxLayout *boradLayout = new QVBoxLayout;
@@ -570,4 +573,10 @@ void KeyboardForm::changeStyle()
     //m_labPyText->setStyleSheet("background: #a0ffffff; border-color: gray; border-width: 1px; border-style: solid; border-radius: 5px;");
     m_pyFrm->setStyleSheet("background:#FFFFFF");
     m_btnFrm->setStyleSheet("background:#D1D4DA;");
+}
+
+
+void KeyboardForm::hideWidget()
+{
+    sendKeyhide();
 }

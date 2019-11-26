@@ -22,7 +22,7 @@ INCLUDEPATH += $$PWD/pinyin
 DEPENDPATH += $$PWD/pinyin
 
 SOURCES += \
-    inputcontext.cpp \
+#    inputcontext.cpp \
     main.cpp \
     googlepinyin.cpp \
     keyboardform.cpp \
@@ -33,7 +33,7 @@ SOURCES += \
 HEADERS +=\
     mainwindow.h \
     pinyinime.h \
-    inputcontext.h \
+#    inputcontext.h \
     googlepinyin.h \
     keyboardform.h \
     keyeventdispatcher.h

@@ -17,6 +17,7 @@ public:
 
 signals:
     void sendKeyToFocusItem(const QString &keyText);
+    void sendKeyhide();
 
 public slots:
     void letterClicked();
@@ -32,6 +33,7 @@ public slots:
     void prevPage();
     void nextPage();
     void changeStyle();
+    void hideWidget();
 
 private:
     void displayHanzi();

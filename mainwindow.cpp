@@ -1,25 +1,115 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    keyTimer = new QTimer(this);
+    keyTimer->setInterval(300);
+    connect(this->keyTimer, &QTimer::timeout, this, &MainWindow::updataTimer);
+
     keyboard = new KeyboardForm();
-    keyboard->setParent(ui->widget);
+    widget = new QWidget;
+    widget->setParent(this);
+    keyboard->setParent(widget);
+    connect(keyboard, &KeyboardForm::sendKeyhide, this, &MainWindow::hideWidget);
+    connect(keyboard, SIGNAL(sendKeyToFocusItem(QString)), &keyEventDispatcher, SLOT(sendKeyToFocusItem(QString)));
 
     int higt = keyboard->height()/2 + 40;
 
-    ui->widget->setGeometry((this->width()-keyboard->width())/2, (this->height() - higt) - 30,
-                            keyboard->width(), higt);
+    widget->setGeometry(0, (this->height() - higt) - 30,
+                            this->width(), higt);
 
     keyboard->setGeometry(0, 0 - keyboard->height()/2 + 40 ,
-                          keyboard->width(), keyboard->height());
+                          this->width(), keyboard->height());
+    ui->pushButton->setFocus();
     keyboard->show();
+    widget->hide();
+
+    requestHide = false;
+    resizewin = false;
+    resizeback = false;
+
+    keyTimer->start();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::hideWidget()
+{
+    requestHide = true;
+    widget->hide();
+    //updateWinGeometry();
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+}
+
+
+void MainWindow::updataTimer()
+{
+    //QLineEdit *lineedit;
+    currentitem=QApplication::focusWidget();
+
+    if(currentitem != NULL)
+    {
+        if(currentitem->inherits("QLineEdit")){
+            //qDebug()<<"It is QLineEdit";
+            keyEventDispatcher.setFocusItem(currentitem);
+            updateWinGeometry();
+            if(!requestHide){
+                ///qDebug()<<"111111111";
+                keyboard->show();
+                widget->show();
+            }
+            else {
+                ///qDebug()<<"222222222";
+                currentitem->clearFocus();
+                requestHide = false;
+            }
+        }
+        else {
+            widget->hide();
+        }
+    }
+}
+
+void MainWindow::updateWinGeometry()
+{
+    int cy = currentitem->y();
+    int hi = currentitem->height();
+    int higt = keyboard->height()/2 + 40;
+    if( currentitem == ui->lineEdit_3 || currentitem == ui->lineEdit_4){
+        if(!resizewin){
+            oldWinSize.setWidth(this->width());
+            oldWinSize.setHeight(this->height());
+            this->resize(this->width(),this->height() + ((cy+hi) - (widget->y()))+20);
+            resizewin = true;
+            resizeback = false;
+
+            this->widget->setGeometry(0, ((this->height() - higt) - 30),
+                                      this->width(), higt);
+
+        }
+    }
+    else if(currentitem == ui->lineEdit || currentitem == ui->lineEdit_2){
+        if(!resizeback && !oldWinSize.isEmpty())
+        {
+            this->resize(oldWinSize);
+            resizeback = true;
+            resizewin = false;
+
+            this->widget->setGeometry(0, ((this->height() - higt) - 30),
+                                      this->width(), higt);
+        }
+
+    }
 }
