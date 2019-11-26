@@ -46,30 +46,23 @@ KeyboardForm::KeyboardForm(QWidget *parent) : QDialog(parent),
     deffont.setPixelSize(18);
 
     //输入框
-//    QHBoxLayout *hline = new QHBoxLayout;
-//    hline->setSpacing(1);
-//    for (int i = 0; i < 2; i++)
-//    {
-//        m_linepyEdit = new QLineEdit;
-//        //m_linepyEdit->setFocusPolicy(Qt::NoFocus);
-//        m_linepyEdit->setFont(deffont);
-//        m_linepyEdit->setStyleSheet("QPushButton{border: none; border-image: none; font-size: 14px}");
-//        hline->addWidget(m_linepyEdit);
-//        m_listLine.append(m_linepyEdit);
-//        //m_listLine->setEnabled(false);
-//        //m_listLine->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-//        //m_listLine->setText(i == 0 ? "\xC2\xAB" : "\xC2\xBB");
-
-//        //connect(m_listLine, SIGNAL(clicked()), SLOT(hanziClicked()));
-//    }
-
+    QHBoxLayout *hline = new QHBoxLayout;
+    hline->setSpacing(1);
+    for (int i = 0; i < 2; i++)
+    {
+        m_linepyEdit = new QLabel;
+        m_linepyEdit->setFont(deffont);
+        m_linepyEdit->setStyleSheet("QPushButton{border: none; border-image: none; font-size: 14px}");
+        hline->addWidget(m_linepyEdit);
+        m_listLine.append(m_linepyEdit);
+    }
 
     // 第一行 显示拼音
-    m_labPyText = new QLabel;
+    m_labPyText = new QLineEdit;
     m_labPyText->setFocusPolicy(Qt::NoFocus);
-    //m_labPyText->setStyleSheet("background: #a0ffffff; border-color: gray; border-width: 1px; border-style: solid; border-radius: 5px;");
+    m_labPyText->adjustSize();
+    m_labPyText->setStyleSheet("background: #a0ffffff; border-color: gray; border-width: 1px; border-style: solid; border-radius: 5px;");
     QHBoxLayout *h1 = new QHBoxLayout;
-    m_labPyText->resize(this->width(),10);
     h1->addWidget(m_labPyText);
     h1->addStretch();
 
@@ -99,12 +92,16 @@ KeyboardForm::KeyboardForm(QWidget *parent) : QDialog(parent),
     connect(m_listHanzi[hanziCandidate-1], SIGNAL(clicked()), SLOT(nextPage()));
 
     // 拼音+汉子 整个放入pyFrm Widget
+    m_enter = new QWidget;
+//    m_enter->setFocusPolicy(Qt::NoFocus);
+//    m_enter->setLayout(h2);
+
     m_pyFrm = new QWidget;
     m_pyFrm->setFocusPolicy(Qt::NoFocus);
     m_pyFrm->setLayout(h2);
     //m_pyFrm->setStyleSheet("background:#FFFFFF");
     QVBoxLayout *pyLayout = new QVBoxLayout;
-    //pyLayout->addLayout(hline);
+    pyLayout->addLayout(hline);
     pyLayout->addLayout(h1);
     pyLayout->addWidget(m_pyFrm);
 
@@ -317,6 +314,8 @@ void KeyboardForm::hanziClicked()
     m_labPyText->clear();
     m_labPyText->hide();
     m_hanziPageCnt = 0;
+    m_listHanzi[1]->setText("");
+    m_listHanzi[1]->setEnabled(false);
     displayHanzi();
 }
 
@@ -324,6 +323,12 @@ void KeyboardForm::setText(QString str)
 {
     m_labPyText->setVisible(str.size());
     m_labPyText->setText(str);
+    if(m_pinyin.HanziModel.size() == 0 && m_inputMode == ImEn){
+        m_listHanzi[1]->setText(str);
+        m_listHanzi[1]->setEnabled(true);
+        m_labPyText->hide();
+    }
+    //sendKeyhave(str);
 }
 
 void KeyboardForm::shiftClicked()
@@ -411,10 +416,19 @@ void KeyboardForm::changeSymbol()
         m_btnSymbol->setText(".?123");
         m_inputMode = (InputMode)m_btnChange->property("Mode").toInt();
         m_btnSpace->setText(m_inputMode == ImCn ? "拼音" : "英文");
-        for (int i = 0; i < m_listCharsBtns.size(); i++)
-        {
-            m_listCharsBtns[i]->setText(QString(QLatin1Char(kbLetter[i])));
+        if(m_inputMode == ImEn){
+            for (int i = 0; i < m_listCharsBtns.size(); i++)
+            {
+                m_listCharsBtns[i+1]->setText(QString(QLatin1Char(kbLetter[i])));
+            }
         }
+        else {
+            for (int i = 0; i < m_listCharsBtns.size(); i++)
+            {
+                m_listCharsBtns[i]->setText(QString(QLatin1Char(kbLetter[i])));
+            }
+        }
+
     }
 }
 
@@ -432,6 +446,10 @@ void KeyboardForm::enter()
         m_labPyText->clear();
         m_hanziPageCnt = 0;
         displayHanzi();
+        if(m_inputMode == ImEn){
+          m_listHanzi[1]->setText("");
+        }
+
     }
     else
     {
@@ -467,12 +485,16 @@ void KeyboardForm::backSpace()
         {
             m_cachePinYin.clear();
             m_labPyText->clear();
+            m_listHanzi[1]->setText("");
+            m_listHanzi[1]->setEnabled(false);
             m_hanziPageCnt = 0;
             displayHanzi();
         }
         else
         {
             m_cachePinYin.clear();
+            m_listHanzi[1]->setText("");
+            m_listHanzi[1]->setEnabled(false);
             m_labPyText->clear();
             sendKeyToFocusItem("\x7F");
         }
@@ -485,7 +507,7 @@ void KeyboardForm::displayHanzi()
     {
         m_listHanzi[0]->setEnabled(false);
         m_listHanzi[hanziCandidate-1]->setEnabled(false);
-        for (int i = 0; i < hanziCandidate-2; i++)
+        for (int i = 1; i < hanziCandidate-2; i++)
         {
             m_listHanzi[i+1]->setText("");
             m_listHanzi[i+1]->setEnabled(false);

@@ -18,6 +18,7 @@ public:
 signals:
     void sendKeyToFocusItem(const QString &keyText);
     void sendKeyhide();
+    void sendKeyhave(const QString &Text);
 
 public slots:
     void letterClicked();
@@ -39,16 +40,17 @@ private:
     void displayHanzi();
 
 private:
+    QWidget *m_enter;               // 输入面板
     QWidget *m_pyFrm;               // 拼音面板
     QWidget *m_btnFrm;              // 按键面板
-    QLabel *m_labPyText;            // 显示拼音
-//    QLineEdit *m_linepyEdit;        //输入框
+    QLineEdit *m_labPyText;            // 显示拼音
+    QLabel *m_linepyEdit;        //输入框
 
     QString m_cachePinYin;          // 真实拼音缓存
 
     QList<QPushButton*> m_listHanzi;
     QList<QPushButton*> m_listCharsBtns; // A-Z Symbol
-//    QList<QLineEdit*> m_listLine;
+    QList<QLabel*> m_listLine;
 
     QVBoxLayout *m_mainLayout;
     QPushButton *m_btnChange;

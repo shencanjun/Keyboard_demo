@@ -24,6 +24,7 @@ private:
     void updataTimer();
     void hideWidget();
     void updateWinGeometry();
+    void havelabel(const QString str);
 
 private:
     Ui::MainWindow *ui;

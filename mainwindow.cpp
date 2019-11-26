@@ -19,12 +19,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(keyboard, &KeyboardForm::sendKeyhide, this, &MainWindow::hideWidget);
     connect(keyboard, SIGNAL(sendKeyToFocusItem(QString)), &keyEventDispatcher, SLOT(sendKeyToFocusItem(QString)));
 
-    int higt = keyboard->height()/2 + 40;
+    int higt = keyboard->height()/2 + 65;
 
     widget->setGeometry(0, (this->height() - higt) - 30,
                             this->width(), higt);
 
-    keyboard->setGeometry(0, 0 - keyboard->height()/2 + 40 ,
+    keyboard->setGeometry(0, 0 - keyboard->height()/2 + 65 ,
                           this->width(), keyboard->height());
     ui->pushButton->setFocus();
     keyboard->show();
@@ -86,7 +86,7 @@ void MainWindow::updateWinGeometry()
 {
     int cy = currentitem->y();
     int hi = currentitem->height();
-    int higt = keyboard->height()/2 + 40;
+    int higt = keyboard->height()/2 + 65;
     if( currentitem == ui->lineEdit_3 || currentitem == ui->lineEdit_4){
         if(!resizewin){
             oldWinSize.setWidth(this->width());
@@ -112,4 +112,9 @@ void MainWindow::updateWinGeometry()
         }
 
     }
+}
+
+
+void MainWindow::havelabel(const QString str)
+{
 }
