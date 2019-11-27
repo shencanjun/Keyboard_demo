@@ -2,6 +2,7 @@
 #define KEYEVENTDISPATCHER_H
 
 #include <QObject>
+#include <QKeyEvent>
 
 class KeyEventDispatcher : public QObject
 {
@@ -14,8 +15,11 @@ public slots:
     QObject * getFocusItem(){return m_focusItem;}
     void setFocusItem(QObject *focusItem);
     void sendKeyToFocusItem(const QString &keyText);
+    void sendKeyMove(const int key, const int modifier);
+
 private:
-    QObject * m_focusItem;
+    QObject *m_focusItem;
+    QList<QWidget* > m_objList;
 };
 
 #endif // KEYEVENTDISPATCHER_H

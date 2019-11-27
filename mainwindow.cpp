@@ -1,12 +1,18 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <QInputMethodEvent>
+#include <QCoreApplication>
+#include <QKeyEvent>
+#include <QPointer>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    //this->installEventFilter(this);
 
     keyTimer = new QTimer(this);
     keyTimer->setInterval(300);
@@ -18,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     keyboard->setParent(widget);
     connect(keyboard, &KeyboardForm::sendKeyhide, this, &MainWindow::hideWidget);
     connect(keyboard, SIGNAL(sendKeyToFocusItem(QString)), &keyEventDispatcher, SLOT(sendKeyToFocusItem(QString)));
+    connect(keyboard, &KeyboardForm::sendKeyMove, &keyEventDispatcher, &KeyEventDispatcher::sendKeyMove);
+    //connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::sendKeyMove);
 
     int higt = keyboard->height()/2 + 65;
 
@@ -33,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     requestHide = false;
     resizewin = false;
     resizeback = false;
+    lineList = this->findChildren<QLineEdit *>();
 
     keyTimer->start();
 }
@@ -51,6 +60,13 @@ void MainWindow::hideWidget()
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
+    if(event->type() == QEvent::KeyPress){
+        qDebug()<<event->type();
+    }
+
+    if(event->type() == QEvent::KeyRelease){
+        qDebug()<<event->type();
+    }
 }
 
 
@@ -117,4 +133,20 @@ void MainWindow::updateWinGeometry()
 
 void MainWindow::havelabel(const QString str)
 {
+
+}
+
+void MainWindow::sendKeyMove()
+{
+    QPointer<QWidget> w = focusWidget();
+
+    if (!w)
+        return;
+
+    QKeyEvent *keyPress;
+
+    keyPress = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier, QString());
+
+    QCoreApplication::sendEvent(currentitem, keyPress);
+
 }

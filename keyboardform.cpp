@@ -45,7 +45,7 @@ KeyboardForm::KeyboardForm(QWidget *parent) : QDialog(parent),
     QFont deffont("Courier");
     deffont.setPixelSize(18);
 
-    //输入框
+    //占位框
     QHBoxLayout *hline = new QHBoxLayout;
     hline->setSpacing(1);
     for (int i = 0; i < 2; i++)
@@ -62,8 +62,17 @@ KeyboardForm::KeyboardForm(QWidget *parent) : QDialog(parent),
     m_labPyText->setFocusPolicy(Qt::NoFocus);
     m_labPyText->adjustSize();
     m_labPyText->setStyleSheet("background: #a0ffffff; border-color: gray; border-width: 1px; border-style: solid; border-radius: 5px;");
+    b_lastFocus = new QPushButton("<<");
+    b_lastFocus->setFocusPolicy(Qt::NoFocus);
+    connect(b_lastFocus, SIGNAL(clicked()), SLOT(moveFouceDown()));
+    b_nextFocus = new QPushButton(">>");
+    b_nextFocus->setFocusPolicy(Qt::NoFocus);
+    connect(b_nextFocus, SIGNAL(clicked()), SLOT(moveFouceUp()));
+
     QHBoxLayout *h1 = new QHBoxLayout;
     h1->addWidget(m_labPyText);
+    h1->addWidget(b_lastFocus);
+    h1->addWidget(b_nextFocus);
     h1->addStretch();
 
     // 第二行 显示汉字，八个候选项
@@ -601,4 +610,14 @@ void KeyboardForm::changeStyle()
 void KeyboardForm::hideWidget()
 {
     sendKeyhide();
+}
+
+void KeyboardForm::moveFouceDown()
+{
+    sendKeyMove(Qt::Key_Tab, Qt::ShiftModifier);
+}
+
+void KeyboardForm::moveFouceUp()
+{
+    sendKeyMove(Qt::Key_Tab, Qt::NoModifier);
 }

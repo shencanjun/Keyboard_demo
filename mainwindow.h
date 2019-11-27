@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QKeyEvent>
 #include "keyboardform.h"
 #include "keyeventdispatcher.h"
 
@@ -25,6 +26,7 @@ private:
     void hideWidget();
     void updateWinGeometry();
     void havelabel(const QString str);
+    void sendKeyMove();
 
 private:
     Ui::MainWindow *ui;
@@ -34,6 +36,7 @@ private:
     QTimer *keyTimer;
     QTimer *geoTimer;
     QWidget *currentitem;
+    QList<QLineEdit *> lineList;
     bool requestHide;
     bool resizewin;
     bool resizeback;
